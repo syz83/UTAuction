@@ -38,10 +38,15 @@
     </div>
     </div>
 
-    {% if alert == "success" %}
+    {% if alert == "registration-success" %}
       <div class ="alert alert-success" role="alert">Registration successful</div>
-    {% elif alert == "mismatch" %}
+    {% elif alert == "registration-error" %}
       <div class ="alert alert-danger" role="alert">Please check that passwords match</div>
+    {% endif %}
+    {% if alert == "login-success" %}
+      <div class ="alert alert-success" role="alert">Login successful</div>
+    {% elif alert == "login-error" %}
+      <div class ="alert alert-danger" role="alert">Login failed</div>
     {% endif %}
 
 
