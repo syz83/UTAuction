@@ -45,8 +45,11 @@
     {% endif %}
     {% if alert == "login-success" %}
       <div class ="alert alert-success" role="alert">Login successful</div>
+      <a href="../market" class="btn btn-primary btn-lrg">Go to Market</a>
     {% elif alert == "login-error" %}
       <div class ="alert alert-danger" role="alert">Login failed</div>
+    {% elif alert == "login-wrong" %}
+      <div class="alert alert-danger" role="alert">Wrong password. Please try again</div>
     {% endif %}
 
 
@@ -62,7 +65,7 @@
               <div class="row">
                   <div class="col-xs-6">
                       <div class="well">
-                          <form id="loginForm" method="POST" action="/login/" novalidate="novalidate">
+                          <form id="loginForm" method="POST" action="/login" novalidate="novalidate">
                               <div class="form-group">
                                   <label for="username" class="control-label">Username</label>
                                   <input type="text" class="form-control" id="username" name="username" value="" required="" title="Please enter you username" placeholder="example@gmail.com">
@@ -102,7 +105,7 @@
               <div class="row">
                   <div class="col-xs-6">
                       <div class="well">
-                          <form id="registerForm" method="POST" action="/register/" novalidate="novalidate">
+                          <form id="registerForm" method="POST" action="/register" novalidate="novalidate">
                               <div class="form-group">
                                   <label for="username" class="control-label">Username</label>
                                   <input type="text" class="form-control" id="username" name="username" value="" required="" title="Please enter your username" placeholder="example@utexas.edu">
