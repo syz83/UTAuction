@@ -38,12 +38,22 @@ class User(UserMixin):
 			return User(user["username"], user["password"])
 		return None
 
+#Useful methods
 def hash_pass(password):
 	"""
 	Return the md5 hash of the password+salt
 	"""
 	salted_password = password + app.secret_key
 	return md5.new(salted_password).hexdigest()
+
+def convert_to_dict(iterable):
+	outer_dict = {}
+	for element in iterable:
+		inner_dict = {} 
+		for key in element:
+			inner_dict[key] = element[key]	
+		outer_dict[element['_id']]= inner_dict
+	return outer_dict
 
 
 
@@ -101,6 +111,25 @@ def register():
 def market():
 	print(current_user.id)
 	return render_template('market.html')
+
+@app.route('/my_items/')
+@login_required
+def my_items():
+	my_items=list(items.find({'userid': current_user.id}))
+
+	return render_template('my_items.html', my_items=my_items)
+
+@app.route('/addItem', methods=['POST', 'GET'])
+@login_required
+def addItem():
+	if request.method == 'POST':
+		item = {k : v for k,v in request.form.items()}
+		item['userid'] = current_user.id
+		items.insert(item)
+		my_items = items.find({'userid': current_user.id})
+		return render_template('my_items.html', my_items=my_items)
+	else:
+		return render_template('my_items.html')
 
 @app.route('/item/')
 def item():

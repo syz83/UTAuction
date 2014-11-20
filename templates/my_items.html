@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% block body %}
+<div class="container">
+	<div class="row">
+		<div class="col-md-6">
+		<h1> My Items </h1>
+		{% for item in my_items %}
+		<ul>
+			<h2>{{ item.title }}</h2>
+			<h3>{{ item.price }}</h3>
+			<p>{{ item.description }}</p>
+		</ul>	
+		{% else %}
+			<li><em>Unbelievable.  No items here so far</em></li>
+		{% endfor %}
+		</div>
+		<div class="col-md-6">
+			<h1> Add Item </h1>
+			<form id="addItem" method="POST" action="/addItem" novalidate="novalidate">
+              <div class="form-group">
+                  <label for="title" class="control-label">Title</label>
+                  <input type="text" class="form-control" id="title" name="title" value="" required="" placeholder="Awesome Thing">
+              </div>
+              <div class="form-group">
+                  <label for="price" class="control-label">Price</label>
+                  <input type="number" class="form-control" id="price" name="price" value="" required="" placeholder="Enter price">
+              </div>
+              <div class="form-group">
+                  <label for="description" class="control-label">Description</label>
+                  <textarea rows="3" type="description" class="form-control" id="description" name="description" value="" required="" placeholder="Enter description"></textarea>
+              </div>
+              <button type="submit" class="btn btn-success btn-block">Add item</button>
+          </form>
+		</div>
+	</div>
+
+</div>
+{% endblock %}

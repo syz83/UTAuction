@@ -135,3 +135,7 @@
 .service-image-left > center > img,.service-image-right > center > img{
 	max-height: 155px;
 }
+
+.top-margin {
+	padding-top: 50px;
+}
