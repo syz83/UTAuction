@@ -6,7 +6,7 @@
 		<h1> My Items </h1>
 		{% for item in my_items %}
 		<ul>
-			<h2>{{ item.title }}</h2>
+			<h2><a href="/details/{{item._id}}">{{ item.title }}</a></h2>
 			<h3>{{ item.price }}</h3>
 			<p>{{ item.description }}</p>
 		</ul>	

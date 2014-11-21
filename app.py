@@ -109,13 +109,13 @@ def register():
 @app.route('/market/')
 @login_required
 def market():
-	print(current_user.id)
-	return render_template('market.html')
+	all_items = items.find() 
+	return render_template('market.html', all_items=all_items)
 
 @app.route('/my_items/')
 @login_required
 def my_items():
-	my_items=list(items.find({'userid': current_user.id}))
+	my_items=items.find({'userid': current_user.id})
 
 	return render_template('my_items.html', my_items=my_items)
 
@@ -131,9 +131,10 @@ def addItem():
 	else:
 		return render_template('my_items.html')
 
-@app.route('/item/')
-def item():
-	return render_template('item.html')
+@app.route('/detail/<_id>')
+def detail(_id):
+	item = items.find_one({'_id':_id})
+	return render_template('detail.html', item=item)
 
 if __name__ == '__main__':
     app.debug = True

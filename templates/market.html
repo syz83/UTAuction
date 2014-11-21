@@ -1,4 +1,11 @@
 {% extends "base.html" %}
 {% block body %}
 	<h1> Market </h1>
+	{% for item in all_items %}
+		<ul>
+			<h2><a href="/detail/{{item._id}}">{{ item.title }}</a></h2>
+			<h3>{{ item.price }}</h3>
+			<p>{{ item.description }}</p>
+		</ul>	
+	{% endfor %}
 {% endblock %}
