@@ -34,13 +34,14 @@ class User(UserMixin):
 		return login_serializer.dumps(data)
 
 	def sellItem(self, id):
-		new_sell_list = self.sell_list.append(id)
-		users.update({"username": self.id}, {"sell_list": new_sell_list})
+		self.sell_list.append(id)
+		print(self.sell_list)
+		users.update({"username": self.id}, {'$set': {"sell_list": self.sell_list}})
 		return None
 
 	def watchItem(self, id):
-		new_watch_list = self.watch_list.append(id)
-		users.update({"username": self.id}, {"sell_list": new_watch_list})
+		self.watch_list.append(id)
+		users.update({"username": self.id}, {'$set': {"watch_list": self.watch_list}})
 		return None
 
 	@staticmethod
@@ -111,13 +112,18 @@ def logout():
 def register():
 	if request.method == 'POST':
 		if request.form['password'] == request.form['confirm-password']:
+			print(request.form['password'])
+			print(request.form['confirm-password'])
 			user = {k : v for k,v in request.form.items()}
-			del user['confirm-password']
-			user['password'] = hash_pass(user['password'])
-			user['sell_list'] = []
-			user['watch_list'] = []
-			users.insert(user)
-			return render_template('index.html', alert = "registration-success")
+			if users.find({"username": user['username']}).count() == 0:
+				del user['confirm-password']
+				user['password'] = hash_pass(user['password'])
+				user['sell_list'] = []
+				user['watch_list'] = []
+				users.insert(user)
+				return render_template('index.html', alert = "registration-success")
+			else:
+				return render_template('index.html', alert = "registration-duplicate")
 		else:
 			return render_template('index.html', alert = "registration-error")
 

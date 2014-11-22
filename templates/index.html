@@ -42,6 +42,8 @@
       <div class ="alert alert-success" role="alert">Registration successful</div>
     {% elif alert == "registration-error" %}
       <div class ="alert alert-danger" role="alert">Please check that passwords match</div>
+    {% elif alert == "registration-duplicate" %}
+      <div class ="alert alert-danger" role="alert">An account with that email already exists</div>
     {% endif %}
     {% if alert == "login-success" %}
       <div class ="alert alert-success" role="alert">Login successful</div>
