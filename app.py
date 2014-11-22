@@ -1,5 +1,6 @@
 from flask import Flask, render_template, redirect, request
 import pymongo
+from bson.objectid import ObjectId
 from flask_login import (LoginManager, login_required, login_user, 
                          current_user, logout_user, UserMixin)
 from itsdangerous import URLSafeTimedSerializer
@@ -21,21 +22,33 @@ login_serializer = URLSafeTimedSerializer(app.secret_key)
 
 #User model
 class User(UserMixin):
-	def __init__(self, username, password, active=True):
+	def __init__(self, username, password, sell_list, watch_list, active=True):
 		self.id = username
 		self.password = password
 		self.active = active
+		self.sell_list = sell_list
+		self.watch_list = watch_list
 
 	def get_auth_token(self):
 		data = [str(self.id), self.password]
 		return login_serializer.dumps(data)
+
+	def sellItem(self, id):
+		new_sell_list = self.sell_list.append(id)
+		users.update({"username": self.id}, {"sell_list": new_sell_list})
+		return None
+
+	def watchItem(self, id):
+		new_watch_list = self.watch_list.append(id)
+		users.update({"username": self.id}, {"sell_list": new_watch_list})
+		return None
 
 	@staticmethod
 	def get(userid):
 		cursor = users.find({"username": userid})
 		if cursor.count() != 0:
 			user = cursor.next()
-			return User(user["username"], user["password"])
+			return User(user["username"], user["password"], user["sell_list"], user["watch_list"])
 		return None
 
 #Useful methods
@@ -78,8 +91,8 @@ def login():
     if request.method == 'POST':
         user = {k : v for k,v in request.form.items()}
         cur_user = User.get(user["username"])
-        print(hash_pass(user['password']))
-        print(cur_user.password)
+        #print(hash_pass(user['password']))
+        #print(cur_user.password)
     if cur_user != None:
     	if hash_pass(user['password']) == cur_user.password:
     		login_user(cur_user)
@@ -101,6 +114,8 @@ def register():
 			user = {k : v for k,v in request.form.items()}
 			del user['confirm-password']
 			user['password'] = hash_pass(user['password'])
+			user['sell_list'] = []
+			user['watch_list'] = []
 			users.insert(user)
 			return render_template('index.html', alert = "registration-success")
 		else:
@@ -126,6 +141,7 @@ def addItem():
 		item = {k : v for k,v in request.form.items()}
 		item['userid'] = current_user.id
 		items.insert(item)
+		current_user.sellItem(items.find(item).next()["_id"])
 		my_items = items.find({'userid': current_user.id})
 		return render_template('my_items.html', my_items=my_items)
 	else:
@@ -133,8 +149,15 @@ def addItem():
 
 @app.route('/detail/<_id>')
 def detail(_id):
-	item = items.find_one({'_id':_id})
+	item = items.find_one({'_id':ObjectId(_id)})
 	return render_template('detail.html', item=item)
+
+@app.route('/watch/')
+def watch():
+	watch_items = list()
+	for id in current_user.watch_list:
+		watch_items.append(items.find_one({"_id": ObjectId(id)}))
+	return render_template('watch.html', watch_items = watch_items)
 
 if __name__ == '__main__':
     app.debug = True
