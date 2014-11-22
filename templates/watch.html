@@ -3,12 +3,13 @@
 <div class="container">
 	<div class="row">
 		<div class="col-md-6">
-		<h1> My Items </h1>
+		<h1> Watch List </h1>
 		{% for item in watch_items %}
 		<ul>
-			<h2><a href="/details/{{item._id}}">{{ item.title }}</a></h2>
+			<h2><a href="/detail/{{item._id}}">{{ item.title }}</a></h2>
 			<h3>{{ item.price }}</h3>
 			<p>{{ item.description }}</p>
+			<a href="/remove_from_watchlist/{{item._id}}" class="btn btn-danger">Remove</a>
 		</ul>	
 		{% else %}
 			<li><em>Unbelievable.  No items here so far</em></li>

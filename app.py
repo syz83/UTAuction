@@ -44,6 +44,19 @@ class User(UserMixin):
 		users.update({"username": self.id}, {'$set': {"watch_list": self.watch_list}})
 		return None
 
+	def removeFromSellList(self, id):
+		print(ObjectId(id))
+		self.sell_list.remove(ObjectId(id))
+		users.update({"username": self.id}, {'$set': {"sell_list": self.sell_list}})
+		return None
+
+	def removeFromWatchList(self, id):
+		print(id)
+		self.watch_list.remove(id)
+		users.update({"username": self.id}, {'$set': {"watch_list": self.watch_list}})
+		return None
+
+
 	@staticmethod
 	def get(userid):
 		cursor = users.find({"username": userid})
@@ -158,13 +171,45 @@ def detail(_id):
 	item = items.find_one({'_id':ObjectId(_id)})
 	return render_template('detail.html', item=item)
 
-@app.route('/watch/')
-def watch():
+@app.route('/watch/<_id>')
+def watch(_id):
+	current_user.watchItem(_id)
+	item = items.find_one({'_id':ObjectId(_id)})
+	return render_template('detail.html', item=item)
+
+@app.route('/watch_list/')
+def watch_list():
 	watch_items = list()
 	for id in current_user.watch_list:
-		watch_items.append(items.find_one({"_id": ObjectId(id)}))
+		witem = items.find_one({"_id": ObjectId(id)})
+		if witem != None:
+			watch_items.append(witem)
 	return render_template('watch.html', watch_items = watch_items)
 
+@app.route('/buy/<_id>')
+def buy(_id):
+	seller = User.get(items.find({"_id": ObjectId(_id)}).next()["userid"])
+	seller.removeFromSellList(_id)
+	items.remove({"_id": ObjectId(_id)})
+	return render_template('thankyou.html')
+
+@app.route('/remove_from_watchlist/<_id>')
+def remove_from_watchlist(_id):
+	current_user.removeFromWatchList(_id)
+	return render_template('watch.html', watch_items = current_user.watch_list)
+
+@app.route('/update/<_id>', methods=['POST', 'GET'])
+def updateItem(_id):
+	if request.method == 'POST':
+		print("gets here")
+		item = {k : v for k,v in request.form.items()}
+		print(item)
+		items.update({'_id': ObjectId(_id)}, {'$set': item})
+		my_items = items.find({'userid': current_user.id})
+		return render_template('my_items.html', my_items=my_items)
+	else:
+		return render_template('my_items.html')
+		
 if __name__ == '__main__':
     app.debug = True
     app.run()

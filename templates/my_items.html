@@ -9,6 +9,7 @@
 			<h2><a href="/detail/{{item._id}}">{{ item.title }}</a></h2>
 			<h3>{{ item.price }}</h3>
 			<p>{{ item.description }}</p>
+			<button id="open-editModal" data-id="{{item._id}}" type="button" class="btn btn-primary" data-toggle="modal" data-target="#editModal">Edit</button>
 		</ul>	
 		{% else %}
 			<li><em>Unbelievable.  No items here so far</em></li>
@@ -23,7 +24,7 @@
               </div>
               <div class="form-group">
                   <label for="price" class="control-label">Price</label>
-                  <input type="number" class="form-control" id="price" name="price" value="" required="" placeholder="Enter price">
+                  <input type="number" class="form-control" id="price" name="price" value="" required="" placeholder="9.50">
               </div>
               <div class="form-group">
                   <label for="description" class="control-label">Description</label>
@@ -35,4 +36,45 @@
 	</div>
 
 </div>
+
+<!-- Modal -->
+<div class="modal fade" id="editModal" tabindex="-1" role="dialog" aria-labelledby="editModal" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+        <h4 class="modal-title" id="myModalLabel">Edit Item</h4>
+      </div>
+      <div class="modal-body">
+			<form id="editItem" method="POST" action="url" novalidate="novalidate">
+              <div class="form-group">
+                  <label for="title" class="control-label">Title</label>
+                  <input type="text" class="form-control" id="title" name="title" value="" required="" placeholder="Awesome Thing">
+              </div>
+              <div class="form-group">
+                  <label for="price" class="control-label">Price</label>
+                  <input type="number" class="form-control" id="price" name="price" value="" required="" placeholder="9.50">
+              </div>
+              <div class="form-group">
+                  <label for="description" class="control-label">Description</label>
+                  <textarea rows="3" type="description" class="form-control" id="description" name="description" value="" required="" placeholder="Enter description"></textarea>
+              </div>
+          </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+        <button type="submit" form="editItem" class="btn btn-success btn-block">Edit item</button>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+$('#open-editModal').click(function () {
+     var itemid = $(this).data('id');
+     console.log(itemid);
+     var urlString = "/update/" + itemid;
+     console.log(urlString);
+     $("#editItem").attr('action', urlString);
+});
+</script>
 {% endblock %}
