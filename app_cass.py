@@ -45,17 +45,16 @@ class User(UserMixin):
 
 	def watchItem(self, id):
 		self.watch_list.append(id)
-		# users.update({"username": self.id}, {'$set': {"watch_list": self.watch_list}})
 		watch_item_query = session.prepare("UPDATE users SET watch_list=? WHERE id=? and username=?")
-		primary_id = session.execute("SELECT id FROM users WHERE username=%s ALLOW FILTERING", (current_user.id))
-		print("LOTS OF CRAPPPPPPPPPPPPP " + str(primary_id[0].id))
-		session.execute(watch_item_query, (self.watch_list, primary_id[0].id, current_user.id))
+		primaryid = session.execute("SELECT id FROM users WHERE username=%s ALLOW FILTERING", (current_user.id))
+		session.execute(watch_item_query, (self.watch_list, primaryid[0].id, current_user.id))
 		return None
 
 	def removeFromWatchList(self, id):
-		print(id)
 		self.watch_list.remove(id)
-		users.update({"username": self.id}, {'$set': {"watch_list": self.watch_list}})
+		watch_item_query = session.prepare("UPDATE users SET watch_list=? WHERE id=? and username=?")
+		primaryid = session.execute("SELECT id FROM users WHERE username=%s ALLOW FILTERING", (current_user.id))
+		session.execute(watch_item_query, (self.watch_list, primaryid[0].id, current_user.id))
 		return None
 
 	@staticmethod
@@ -153,12 +152,47 @@ def watch(id):
 @app.route('/watch_list/')
 def watch_list():
 	watch_items = list()
-
 	for id in current_user.watch_list:
-		witem = session.execute("SELECT * FROM items WHERE id=" + id)[0]
-		if witem != None:
-			watch_items.append(witem)
+		witem = session.execute("SELECT * FROM items WHERE id=" + id)
+		print("LSDKFJDSLKFJDFLKJLSDKJ: " + str(witem))
+		if witem:
+			watch_items.append(witem[0])
 	return render_template('watch.html', watch_items = watch_items)
+
+@app.route('/remove_from_watchlist/<id>')
+def remove_from_watchlist(id):
+	current_user.removeFromWatchList(id)
+	watch_items = list()
+	for id in current_user.watch_list:
+		witem = session.execute("SELECT * FROM items WHERE id=" + id)
+		if witem:
+			watch_items.append(witem[0])
+	return render_template('watch.html', watch_items = watch_items)
+
+@app.route('/removeItem/<id>')
+def removeItem(id):
+	session.execute("DELETE FROM items where id=" + id)
+	item_query = session.prepare("SELECT * FROM items WHERE userid=? ALLOW FILTERING")
+	item_rows = session.execute(item_query, [current_user.id])
+	my_items = list()
+	for item in item_rows:
+		my_items.append(item)
+	return render_template('my_items.html', my_items=my_items)
+
+@app.route('/update/<id>', methods=['POST', 'GET'])
+def updateItem(id):
+	if request.method == 'POST':
+		item = {k : v for k,v in request.form.items()}
+		update_sell_item = session.prepare("UPDATE items SET title=?, price=?, description=? WHERE userid=? and id=" + id)
+		session.execute(update_sell_item, (item['title'], item['price'], item['description'], current_user.id))
+		item_query = session.prepare("SELECT * FROM items WHERE userid=? ALLOW FILTERING")
+		item_rows = session.execute(item_query, [current_user.id])
+		my_items = list()
+		for item in item_rows:
+			my_items.append(item)
+		return render_template('my_items.html', my_items=my_items)
+	else:
+		return render_template('my_items.html')
 
 @app.route('/login', methods=['POST', 'GET'])
 def login():
