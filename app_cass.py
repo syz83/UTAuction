@@ -17,7 +17,7 @@ table_users = "users"
 
 table_items = "items"
 
-session.execute("CREATE TABLE IF NOT EXISTS %s(id uuid, username text, password text, watch_list list<uuid>, primary key(id, username));"%table_users)
+session.execute("CREATE TABLE IF NOT EXISTS %s(id uuid, username text, password text, watch_list list<text>, primary key(id, username));"%table_users)
 
 session.execute("CREATE TABLE IF NOT EXISTS %s(id uuid, userid text, title text, price text, description text, primary key(id, userid));"%table_items)
 
@@ -44,12 +44,12 @@ class User(UserMixin):
 		return login_serializer.dumps(data)
 
 	def watchItem(self, id):
-		print("LOTS OF CRAPPPPPPPPPPPPP " + id)
 		self.watch_list.append(id)
 		# users.update({"username": self.id}, {'$set': {"watch_list": self.watch_list}})
-		watch_item_query = session.prepare("UPDATE users SET watch_list=? WHERE id=?")
+		watch_item_query = session.prepare("UPDATE users SET watch_list=? WHERE id=? and username=?")
 		primary_id = session.execute("SELECT id FROM users WHERE username=%s ALLOW FILTERING", (current_user.id))
-		session.execute(watch_item_query, (self.watch_list, primary_id))
+		print("LOTS OF CRAPPPPPPPPPPPPP " + str(primary_id[0].id))
+		session.execute(watch_item_query, (self.watch_list, primary_id[0].id, current_user.id))
 		return None
 
 	def removeFromWatchList(self, id):
@@ -153,9 +153,9 @@ def watch(id):
 @app.route('/watch_list/')
 def watch_list():
 	watch_items = list()
-	watch_query = session.prepare("SELECT * FROM items WHERE id=?")
+
 	for id in current_user.watch_list:
-		witem = session.execute(watch_query, id)
+		witem = session.execute("SELECT * FROM items WHERE id=" + id)[0]
 		if witem != None:
 			watch_items.append(witem)
 	return render_template('watch.html', watch_items = watch_items)
