@@ -45,8 +45,8 @@ class User(UserMixin):
 		return None
 
 	def removeFromSellList(self, id):
-		print(ObjectId(id))
 		self.sell_list.remove(ObjectId(id))
+		print("SELL LIST: " + str(self.sell_list))
 		users.update({"username": self.id}, {'$set': {"sell_list": self.sell_list}})
 		return None
 
@@ -202,6 +202,17 @@ def remove_from_watchlist(_id):
 		if witem != None:
 			watch_items.append(witem)
 	return render_template('watch.html', watch_items = watch_items)
+
+@app.route('/removeItem/<_id>')
+def removeItem(_id):
+	current_user.removeFromSellList(_id)
+	items.remove({"_id": ObjectId(_id)})
+	my_items = list()
+	for itemid in current_user.sell_list:
+		sitem = items.find_one({"_id": itemid})
+		if sitem != None:
+			my_items.append(sitem)
+	return render_template('my_items.html', my_items=my_items)
 
 @app.route('/update/<_id>', methods=['POST', 'GET'])
 def updateItem(_id):
