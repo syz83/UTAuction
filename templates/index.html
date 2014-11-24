@@ -47,7 +47,9 @@
     {% endif %}
     {% if alert == "login-success" %}
       <div class ="alert alert-success" role="alert">Login successful</div>
-      <a href="../market" class="btn btn-primary btn-lrg">Go to Market</a>
+      <div style="text-align:center">
+      <a href="../market" class="btn btn-primary btn-lg">Go to Market</a>
+      </div>
     {% elif alert == "login-error" %}
       <div class ="alert alert-danger" role="alert">Login failed</div>
     {% elif alert == "login-wrong" %}
