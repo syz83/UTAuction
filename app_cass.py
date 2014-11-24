@@ -189,8 +189,10 @@ def buy(id):
 def updateItem(id):
 	if request.method == 'POST':
 		item = {k : v for k,v in request.form.items()}
-		update_sell_item = session.prepare("UPDATE items SET title=?, price=?, description=? WHERE userid=? and id=" + id)
-		session.execute(update_sell_item, (item['title'], item['price'], item['description'], current_user.id))
+		old_item = session.execute("SELECT title, price, description FROM items WHERE id=" + id)
+		print("OWEJOEIWFJIDJI " + old_item[0].title)
+		update_sell_item = session.prepare("UPDATE items SET title=?, price=?, description=? WHERE userid=? and id=" + id + " IF title=? and price=? and description=?")
+		session.execute(update_sell_item, (item['title'], item['price'], item['description'], current_user.id, old_item[0].title, old_item[0].price, old_item[0].description))
 		item_query = session.prepare("SELECT * FROM items WHERE userid=? ALLOW FILTERING")
 		item_rows = session.execute(item_query, [current_user.id])
 		my_items = list()
