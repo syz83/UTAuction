@@ -130,7 +130,7 @@ def addItem():
 		item = {k : v for k,v in request.form.items()}
 		item['userid'] = current_user.id
 		id = uuid.uuid4()
-		insert_item = "INSERT INTO items (id, userid, title, price, description) values("+str(id)+", %s, %s, %s, %s)"
+		insert_item = "INSERT INTO items (id, userid, title, price, description) values("+str(id)+", %s, %s, %s, %s) IF NOT EXISTS"
 		session.execute(insert_item, (current_user.id, item['title'], item['price'], item['description']))
 		# session.execute(insert_item, (item['userid'], item['title'], item['price'], item['description']))
 		select_my_items = session.prepare("SELECT * FROM items WHERE userid=? ALLOW FILTERING")
@@ -179,6 +179,12 @@ def removeItem(id):
 		my_items.append(item)
 	return render_template('my_items.html', my_items=my_items)
 
+@app.route('/buy/<id>')
+def buy(id):
+	session.execute("DELETE FROM items where id=" + id)
+	return render_template('thankyou.html')
+
+
 @app.route('/update/<id>', methods=['POST', 'GET'])
 def updateItem(id):
 	if request.method == 'POST':
@@ -221,7 +227,7 @@ def register():
 		if request.form['password'] == request.form['confirm-password']:
 			user = {k : v for k,v in request.form.items()}
 			id = uuid.uuid4()
-			insert_statement = "INSERT INTO "+table_users+"(id, username, password, watch_list) values("+str(id)+", %s, %s, %s)"
+			insert_statement = "INSERT INTO "+table_users+"(id, username, password, watch_list) values("+str(id)+", %s, %s, %s) IF NOT EXISTS"
 			session.execute(insert_statement, (user['username'], hash_pass(user['password']), []))	
 			# session.execute(insert_statement, ('password', hash_pass(user['password'])))	
 			return render_template('index.html', alert = "registration-success")
