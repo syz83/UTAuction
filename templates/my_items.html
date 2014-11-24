@@ -6,10 +6,10 @@
 		<h1> My Items </h1>
 		{% for item in my_items %}
 		<ul>
-			<h2><a href="/detail/{{item._id}}">{{ item.title }}</a></h2>
+			<h2><a href="/detail/{{item.id}}">{{ item.title }}</a></h2>
 			<h3>{{ item.price }}</h3>
 			<p>{{ item.description }}</p>
-			<button id="open-editModal" data-id="{{item._id}}" type="button" class="btn btn-primary" data-toggle="modal" data-target="#editModal">Edit</button>
+			<button id="open-editModal" data-id="{{item.id}}" type="button" class="btn btn-primary" data-toggle="modal" data-target="#editModal">Edit</button>
 		</ul>	
 		{% else %}
 			<li><em>Unbelievable.  No items here so far</em></li>

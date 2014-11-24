@@ -6,10 +6,10 @@
 		<h1> Watch List </h1>
 		{% for item in watch_items %}
 		<ul>
-			<h2><a href="/detail/{{item._id}}">{{ item.title }}</a></h2>
+			<h2><a href="/detail/{{item.id}}">{{ item.title }}</a></h2>
 			<h3>{{ item.price }}</h3>
 			<p>{{ item.description }}</p>
-			<a href="/remove_from_watchlist/{{item._id}}" class="btn btn-danger">Remove</a>
+			<a href="/remove_from_watchlist/{{item.id}}" class="btn btn-danger">Remove</a>
 		</ul>	
 		{% else %}
 			<li><em>Unbelievable.  No items here so far</em></li>
