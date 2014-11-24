@@ -7,7 +7,7 @@
 		{% for item in my_items %}
 		<ul>
 			<h2><a href="/detail/{{item.id}}">{{ item.title }}</a></h2>
-			<h3>{{ item.price }}</h3>
+			<h3>${{ item.price }}</h3>
 			<p>{{ item.description }}</p>
 			<button id="open-editModal" data-id="{{item.id}}" type="button" class="btn btn-primary" data-toggle="modal" data-target="#editModal">Edit</button>
       <a href="/removeItem/{{item.id}}" class="btn btn-danger">Remove</a>

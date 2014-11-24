@@ -139,3 +139,10 @@
 .top-margin {
 	padding-top: 50px;
 }
+
+.centered
+{
+    margin-right: auto;
+    margin-left: auto;
+    width: 800px;
+}
