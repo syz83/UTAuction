@@ -196,7 +196,12 @@ def buy(_id):
 @app.route('/remove_from_watchlist/<_id>')
 def remove_from_watchlist(_id):
 	current_user.removeFromWatchList(_id)
-	return render_template('watch.html', watch_items = current_user.watch_list)
+	watch_items = list()
+	for id in current_user.watch_list:
+		witem = items.find_one({"_id": ObjectId(id)})
+		if witem != None:
+			watch_items.append(witem)
+	return render_template('watch.html', watch_items = watch_items)
 
 @app.route('/update/<_id>', methods=['POST', 'GET'])
 def updateItem(_id):
@@ -209,7 +214,7 @@ def updateItem(_id):
 		return render_template('my_items.html', my_items=my_items)
 	else:
 		return render_template('my_items.html')
-		
+
 if __name__ == '__main__':
     app.debug = True
     app.run()
