@@ -226,6 +226,14 @@ def updateItem(_id):
 	else:
 		return render_template('my_items.html')
 
+@app.route('/search/', methods=['POST', 'GET'])
+def search():
+	if request.method == 'POST':
+		search_items = items.find({'title': request.form['title']})
+		return render_template('search.html', search_items = search_items)
+	else:
+		return render_template('search.html')
+
 if __name__ == '__main__':
     app.debug = True
     app.run()
