@@ -35,7 +35,6 @@ class User(UserMixin):
 
 	def sellItem(self, id):
 		self.sell_list.append(id)
-		print(self.sell_list)
 		users.update({"username": self.id}, {'$set': {"sell_list": self.sell_list}})
 		return None
 
@@ -46,14 +45,10 @@ class User(UserMixin):
 
 	def removeFromSellList(self, id):
 		self.sell_list.remove(ObjectId(id))
-		print("SELL LIST: " + str(self.sell_list))
 		users.update({"username": self.id}, {'$set': {"sell_list": self.sell_list}})
 		return None
 
 	def removeFromWatchList(self, id):
-		print(id)
-		self.watch_list.remove(id)
-		users.update({"username": self.id}, {'$set': {"watch_list": self.watch_list}})
 		return None
 
 
@@ -105,8 +100,6 @@ def login():
     if request.method == 'POST':
         user = {k : v for k,v in request.form.items()}
         cur_user = User.get(user["username"])
-        #print(hash_pass(user['password']))
-        #print(cur_user.password)
     if cur_user != None:
     	if hash_pass(user['password']) == cur_user.password:
     		login_user(cur_user)
@@ -125,8 +118,6 @@ def logout():
 def register():
 	if request.method == 'POST':
 		if request.form['password'] == request.form['confirm-password']:
-			print(request.form['password'])
-			print(request.form['confirm-password'])
 			user = {k : v for k,v in request.form.items()}
 			if users.find({"username": user['username']}).count() == 0:
 				del user['confirm-password']
@@ -217,9 +208,7 @@ def removeItem(_id):
 @app.route('/update/<_id>', methods=['POST', 'GET'])
 def updateItem(_id):
 	if request.method == 'POST':
-		print("gets here")
 		item = {k : v for k,v in request.form.items()}
-		print(item)
 		items.update({'_id': ObjectId(_id)}, {'$set': item})
 		my_items = items.find({'userid': current_user.id})
 		return render_template('my_items.html', my_items=my_items)
