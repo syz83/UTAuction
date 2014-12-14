@@ -108,14 +108,12 @@ def market():
 
 @app.route('/detail/<id>')
 def detail(id):
-	# item = items.find_one({'id':ObjectId(id)})
 	item = session.execute("SELECT * FROM items WHERE id=" + id)[0]
 	return render_template('detail.html', item=item)
 
 @app.route('/my_items/')
 @login_required
 def my_items():
-	# my_items=items.find({'userid': current_user.id})
 	item_query = session.prepare("SELECT * FROM items WHERE userid=? ALLOW FILTERING")
 	item_rows = session.execute(item_query, [current_user.id])
 	my_items = list()
@@ -132,9 +130,6 @@ def addItem():
 		id = uuid.uuid4()
 		insert_item = "INSERT INTO items (id, userid, title, price, description) values("+str(id)+", %s, %s, %s, %s) IF NOT EXISTS"
 		session.execute(insert_item, (current_user.id, item['title'], item['price'], item['description']))
-		# session.execute(insert_item, (item['userid'], item['title'], item['price'], item['description']))
-		select_my_items = session.prepare("SELECT * FROM items WHERE userid=? ALLOW FILTERING")
-		item_rows = session.execute(select_my_items, [current_user.id])
 		my_items = list()
 		for item in item_rows:
 			my_items.append(item) 
@@ -154,7 +149,6 @@ def watch_list():
 	watch_items = list()
 	for id in current_user.watch_list:
 		witem = session.execute("SELECT * FROM items WHERE id=" + id)
-		print("LSDKFJDSLKFJDFLKJLSDKJ: " + str(witem))
 		if witem:
 			watch_items.append(witem[0])
 	return render_template('watch.html', watch_items = watch_items)
@@ -190,7 +184,6 @@ def updateItem(id):
 	if request.method == 'POST':
 		item = {k : v for k,v in request.form.items()}
 		old_item = session.execute("SELECT title, price, description FROM items WHERE id=" + id)
-		print("OWEJOEIWFJIDJI " + old_item[0].title)
 		update_sell_item = session.prepare("UPDATE items SET title=?, price=?, description=? WHERE userid=? and id=" + id + " IF title=? and price=? and description=?")
 		session.execute(update_sell_item, (item['title'], item['price'], item['description'], current_user.id, old_item[0].title, old_item[0].price, old_item[0].description))
 		item_query = session.prepare("SELECT * FROM items WHERE userid=? ALLOW FILTERING")
@@ -207,8 +200,6 @@ def login():
     if request.method == 'POST':
         user = {k : v for k,v in request.form.items()}
         cur_user = User.get(user["username"])
-        #print(hash_pass(user['password']))
-        print("JDLFJDSLKFJDSLKFJDLSKFJLSKFJFDSJLFJDSK" + str(cur_user.password))
     if cur_user != None:
     	if hash_pass(user['password']) == cur_user.password:
     		login_user(cur_user)
@@ -231,8 +222,6 @@ def register():
 			id = uuid.uuid4()
 			insert_statement = "INSERT INTO "+table_users+"(id, username, password, watch_list) values("+str(id)+", %s, %s, %s) IF NOT EXISTS"
 			session.execute(insert_statement, (user['username'], hash_pass(user['password']), []))	
-			# session.execute(insert_statement, ('password', hash_pass(user['password'])))	
-			return render_template('index.html', alert = "registration-success")
 		else:
 			return render_template('index.html', alert = "registration-error")
 
